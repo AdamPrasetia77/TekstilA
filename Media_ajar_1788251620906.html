@@ -1,0 +1,1983 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <!-- Chosen Palette: Warm Neutral Harmony (Background: #F9F8F3, Surface: #FFFFFF, Primary Text: #1F2937, Brand Teal: #0D9488, Accent Amber: #D97706, Border: #E5E7EB) -->
+    <!-- Application Structure Plan: Designed as a 6-Stage Interactive Teaching & Learning Hub for Fase E Informatics (Flowchart & Pseudocode). Stage 2 (Apersepsi) features collapsible Dropdown and Accordion components for Definition of Algorithm and 5 Knuth Characteristics to keep information compact and easily explorable before moving to core studio materials. Stage 4 uses distinct practice cases from the school and home environment, separate from core studio examples. -->
+    <!-- Visualization & Content Choices: 
+         - Pre/Post Test Comparison: Dynamic Chart.js Bar & Radar charts for displaying student competency diagnostics without SVG.
+         - Flowchart Visualizer: Pure HTML5 Canvas dynamic drawing engine to render standard flowcharts (Terminal, Decision, Process, Input/Output) without SVG or Mermaid JS.
+         - Dropdown/Accordion Definition Explorer: Interactive collapsible cards and select menus for algorithm definitions and Donald E. Knuth's 5 characteristics.
+         - Canva Poster Mockup: Scaled HTML/CSS container simulating exact 21x29.7cm (A4 ratio) layout checklist.
+         - Interactive Symbol Matrix: Clickable grid with Canvas symbol previews and code mapping snippets. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Ajar Interaktif: Algoritma, Flowchart & Pseudocode - Fase E SMK</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        warmbg: '#F9F8F3',
+                        cardbg: '#FFFFFF',
+                        brandteal: {
+                            50: '#F0FDFA',
+                            100: '#CCFBF1',
+                            500: '#14B8A6',
+                            600: '#0D9488',
+                            700: '#0F766E',
+                            800: '#115E59'
+                        },
+                        amberaccent: {
+                            50: '#FFFBEB',
+                            500: '#F59E0B',
+                            600: '#D97706',
+                            700: '#B45309'
+                        },
+                        slatecustom: {
+                            700: '#334155',
+                            800: '#1E293B',
+                            900: '#0F172A'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 550px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 280px;
+            max-height: 350px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 320px;
+            }
+        }
+        .a4-preview-ratio {
+            width: 100%;
+            max-width: 360px;
+            min-height: 680px;
+            height: auto;
+        }
+        .code-font {
+            font-family: 'Courier New', Courier, monospace;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F1F1F1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94A3B8;
+        }
+
+        /* Presentation-friendly visual refresh */
+        :root {
+            --ink: #0f172a;
+            --muted-ink: #64748b;
+            --teal: #0d9488;
+            --teal-dark: #0f766e;
+            --amber: #f59e0b;
+            --soft-border: rgba(148, 163, 184, 0.24);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-image:
+                radial-gradient(circle at 8% 8%, rgba(20, 184, 166, 0.12), transparent 28rem),
+                radial-gradient(circle at 92% 18%, rgba(245, 158, 11, 0.10), transparent 24rem),
+                linear-gradient(135deg, #f8fafc 0%, #f9f8f3 48%, #f0fdfa 100%);
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.90);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        .brand-mark {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0f766e, #14b8a6);
+            box-shadow: 0 10px 22px rgba(13, 148, 136, 0.24);
+        }
+
+        .brand-mark::after {
+            content: '';
+            position: absolute;
+            width: 2.75rem;
+            height: 2.75rem;
+            border: 2px solid rgba(255, 255, 255, 0.28);
+            border-radius: 999px;
+            transform: translate(0.85rem, -1.25rem);
+        }
+
+        #stepNav {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,.25) transparent;
+        }
+
+        #stepNav button {
+            border: 1px solid transparent;
+        }
+
+        #stepNav button:hover {
+            transform: translateY(-1px);
+        }
+
+        .step-content > div {
+            position: relative;
+            overflow: hidden;
+            border-color: var(--soft-border);
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.07);
+        }
+
+        .step-content > div::before {
+            content: '';
+            position: absolute;
+            inset: 0 0 auto;
+            height: 4px;
+            background: linear-gradient(90deg, #0d9488, #14b8a6 52%, #f59e0b);
+            opacity: 0.9;
+        }
+
+        .step-content:not(.hidden) {
+            animation: content-rise 0.38s ease both;
+        }
+
+        .step-content button,
+        .step-content select {
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+        }
+
+        .step-content button:hover {
+            box-shadow: 0 7px 16px rgba(15, 23, 42, 0.08);
+        }
+
+        .step-content button:focus-visible,
+        .step-content select:focus-visible {
+            outline: 3px solid rgba(20, 184, 166, 0.28);
+            outline-offset: 2px;
+        }
+
+        #symbolsGrid button {
+            min-height: 142px;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            border-color: rgba(148, 163, 184, 0.30);
+        }
+
+        #symbolsGrid button:hover {
+            border-color: rgba(13, 148, 136, 0.55);
+            transform: translateY(-3px);
+        }
+
+        #symbolsGrid button > div {
+            width: 4.5rem;
+            height: 4.5rem;
+            border-radius: 1rem;
+            background: linear-gradient(135deg, #f0fdfa, #ecfeff);
+            box-shadow: inset 0 0 0 1px rgba(13, 148, 136, 0.10);
+        }
+
+        #symbolDetailPanel {
+            background:
+                radial-gradient(circle at 5% 10%, rgba(20, 184, 166, 0.16), transparent 16rem),
+                linear-gradient(135deg, #f0fdfa, #fffaf0);
+            border-color: rgba(13, 148, 136, 0.28);
+            box-shadow: 0 14px 32px rgba(13, 148, 136, 0.10);
+        }
+
+        #symbolDetailPanel > div:first-child {
+            flex: 0 0 auto;
+            width: 13rem;
+            height: 13rem;
+            border-color: rgba(13, 148, 136, 0.22);
+            box-shadow: 0 12px 25px rgba(15, 23, 42, 0.10);
+        }
+
+        #symbolDetailCanvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        #posterCanvas {
+            display: block;
+            width: 100%;
+            max-width: 320px;
+            height: auto;
+        }
+
+        .lkpd-pseudocode {
+            white-space: pre-line;
+            overflow-wrap: anywhere;
+            line-height: 1.45;
+        }
+
+        #symTitle {
+            color: var(--ink);
+            letter-spacing: -0.02em;
+        }
+
+        #symDesc {
+            color: #334155;
+            font-size: 1rem;
+            line-height: 1.65;
+        }
+
+        #symAnalogy {
+            color: #475569;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        @keyframes content-rise {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 767px) {
+            #symbolDetailPanel > div:first-child {
+                width: 11rem;
+                height: 11rem;
+            }
+
+            #symDesc {
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-warmbg text-slatecustom-800 font-sans antialiased min-h-screen flex flex-col justify-between">
+
+    <!-- TOP HEADER -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="brand-mark bg-brandteal-600 text-white p-2.5 rounded-xl font-bold text-lg flex items-center justify-center w-10 h-10 shadow-sm">
+                    ⚡
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span class="bg-brandteal-50 text-brandteal-700 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-brandteal-100">Informatika Fase E</span>
+                        <span class="bg-amberaccent-50 text-amberaccent-700 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-amberaccent-500/20">Kelas X SMK</span>
+                    </div>
+                    <h1 class="text-lg md:text-xl font-bold text-slatecustom-900 tracking-tight">Representasi Algoritma: Flowchart & Pseudocode</h1>
+                </div>
+            </div>
+
+            <!-- Global Target Links Bar -->
+            <div class="flex flex-wrap items-center gap-2 text-xs">
+                <button onclick="openExternalLink('quizizz')" class="inline-flex items-center gap-1.5 bg-purple-50 hover:bg-purple-100 text-purple-700 font-medium px-3 py-1.5 rounded-lg border border-purple-200 transition">
+                    <span>🟣 Link Quizizz (Pre/Post)</span>
+                </button>
+                <button onclick="openExternalLink('drive')" class="inline-flex items-center gap-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium px-3 py-1.5 rounded-lg border border-blue-200 transition">
+                    <span>📁 G-Drive LKPD</span>
+                </button>
+                <button onclick="openExternalLink('padlet')" class="inline-flex items-center gap-1.5 bg-pink-50 hover:bg-pink-100 text-pink-700 font-medium px-3 py-1.5 rounded-lg border border-pink-200 transition">
+                    <span>📌 Padlet Refleksi</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- PROGRESSIVE STEP NAVIGATION BAR -->
+        <nav class="bg-slatecustom-900 text-white px-4 sm:px-6 lg:px-8 overflow-x-auto shadow-lg">
+            <div class="max-w-7xl mx-auto flex space-x-1 py-1.5 text-xs font-medium whitespace-nowrap" id="stepNav">
+                <button onclick="switchStep('step1')" id="nav-step1" class="px-3.5 py-2 rounded-md transition flex items-center gap-2 bg-brandteal-600 text-white font-semibold">
+                    <span class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px]">1</span> Diagnostik & Pre-Test
+                </button>
+                <button onclick="switchStep('step2')" id="nav-step2" class="px-3.5 py-2 rounded-md transition flex items-center gap-2 text-gray-300 hover:text-white hover:bg-slatecustom-800">
+                    <span class="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-[10px]">2</span> Review Apersepsi
+                </button>
+                <button onclick="switchStep('step3')" id="nav-step3" class="px-3.5 py-2 rounded-md transition flex items-center gap-2 text-gray-300 hover:text-white hover:bg-slatecustom-800">
+                    <span class="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-[10px]">3</span> Materi Core Studio
+                </button>
+                <button onclick="switchStep('step4')" id="nav-step4" class="px-3.5 py-2 rounded-md transition flex items-center gap-2 text-gray-300 hover:text-white hover:bg-slatecustom-800">
+                    <span class="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-[10px]">4</span> Praktik LKPD Canva
+                </button>
+                <button onclick="switchStep('step5')" id="nav-step5" class="px-3.5 py-2 rounded-md transition flex items-center gap-2 text-gray-300 hover:text-white hover:bg-slatecustom-800">
+                    <span class="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-[10px]">5</span> Evaluasi Post-Test
+                </button>
+                <button onclick="switchStep('step6')" id="nav-step6" class="px-3.5 py-2 rounded-md transition flex items-center gap-2 text-gray-300 hover:text-white hover:bg-slatecustom-800">
+                    <span class="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-[10px]">6</span> Refleksi Padlet
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full">
+
+        <!-- ================= STEP 1: DIAGNOSTIK & PRE-TEST ================= -->
+        <section id="step1" class="step-content space-y-6">
+            <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+                <div class="flex flex-col lg:flex-row justify-between lg:items-center gap-4 border-b border-gray-100 pb-4 mb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-slatecustom-900 flex items-center gap-2">
+                            <span>🎯 Tahap 1: Asesmen Diagnostik & Pre-Test</span>
+                        </h2>
+                        <p class="text-sm text-gray-600 mt-1">
+                            Tahap awal ini bertujuan mengukur sejauh mana Anda memahami materi algoritma deskriptif yang telah dipelajari pada pertemuan sebelumnya bersama guru pengampu terdahulu, serta memetakan kesiapan menerima materi Flowchart & Pseudocode.
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="openExternalLink('quizizz')" class="bg-purple-600 hover:bg-purple-700 text-white font-medium px-5 py-2.5 rounded-xl shadow-sm text-sm flex items-center gap-2 transition">
+                            <span>Buka Quizizz Langsung</span> ↗
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Split Grid: Interactive Pre-test Simulator & Analytical Target -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="lg:col-span-7 bg-warmbg p-5 rounded-xl border border-gray-200">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs font-bold uppercase tracking-wider text-purple-700 bg-purple-100 px-2.5 py-1 rounded">Simulasi Pre-Test Interaktif (5 Soal)</span>
+                            <span id="quizScoreBadge" class="text-xs font-semibold text-gray-500">Skor: 0 / 5</span>
+                        </div>
+                        
+                        <div id="quizCard" class="bg-white p-5 rounded-lg border border-gray-200 shadow-xs">
+                            <div class="flex justify-between text-xs text-gray-400 mb-2">
+                                <span id="questionNum">Soal 1 dari 5</span>
+                                <span id="questionTopic" class="font-medium text-brandteal-700">Algoritma Dasar</span>
+                            </div>
+                            <h3 id="questionText" class="font-semibold text-base text-gray-800 mb-4">
+                                Apa pengertian dari Algoritma dalam bidang Informatika?
+                            </h3>
+                            <div id="optionsContainer" class="space-y-2.5">
+                                <!-- Options dynamically rendered -->
+                            </div>
+                            <div id="feedbackBox" class="mt-4 p-3 rounded-lg text-xs font-medium hidden"></div>
+                            
+                            <div class="flex justify-between items-center mt-5 pt-3 border-t border-gray-100">
+                                <button id="prevBtn" onclick="navigateQuiz(-1)" class="px-3.5 py-1.5 text-xs font-medium text-gray-500 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-40">Sebelumnya</button>
+                                <button id="nextBtn" onclick="navigateQuiz(1)" class="px-4 py-1.5 text-xs font-medium text-white bg-brandteal-600 rounded-lg hover:bg-brandteal-700">Selanjutnya</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-5 bg-white p-5 rounded-xl border border-gray-200 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-bold text-gray-800 text-sm mb-1">Target Peta Pemahaman Awal Kelas</h3>
+                            <p class="text-xs text-gray-500 mb-4">Visualisasi hasil agregat diagnostik kognitif awal siswa.</p>
+                            
+                            <div class="chart-container">
+                                <canvas id="chartDiagnostik"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 bg-amberaccent-50 p-3 rounded-lg border border-amberaccent-500/20 text-xs text-amberaccent-700">
+                            <strong>💡 Catatan Guru:</strong> Jika >60% siswa berada di kategori "Dasar", ulasan singkat materi deskriptif pada Tahap 2 perlu diperjelas dengan analogi sehari-hari.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= STEP 2: REVIEW APERSEPSI LENGKAP ================= -->
+        <section id="step2" class="step-content space-y-6 hidden">
+            <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+                <div class="border-b border-gray-100 pb-4 mb-4">
+                    <h2 class="text-xl font-bold text-slatecustom-900 flex items-center gap-2">
+                        <span>🔄 Tahap 2: Review Apersepsi (Fondasi Algoritma → Representasi Terstruktur)</span>
+                    </h2>
+                    <p class="text-sm text-gray-600 mt-1">
+                        Kita mulai dari hal yang dekat dengan keseharian: membuat minuman, menyiapkan bahan karya, atau memeriksa hasil sebelum dipajang. Semua kegiatan itu memiliki urutan langkah yang disebut <strong>algoritma</strong>.
+                    </p>
+                </div>
+
+                <!-- SUB-PART A: DEFINISI ALGORITMA IN DROPDOWN / ACCORDION -->
+                <div class="space-y-4">
+                    <div class="bg-white border border-brandteal-200 rounded-xl overflow-hidden shadow-xs">
+                        <button onclick="toggleDefinisiDropdown()" class="w-full bg-brandteal-50 hover:bg-brandteal-100/80 p-4 text-left flex items-center justify-between transition">
+                            <div class="flex items-center gap-3">
+                                <span class="bg-brandteal-600 text-white font-bold text-xs px-2.5 py-1 rounded-md">DROPDOWN 1</span>
+                                <div>
+                                    <h3 class="font-bold text-sm md:text-base text-slatecustom-900">📖 Pengertian & Konsep Dasar Algoritma</h3>
+                                    <p class="text-xs text-brandteal-800">Klik untuk membuka / menutup detail definisi lengkap dan kata kunci utama</p>
+                                </div>
+                            </div>
+                            <span id="definisiIcon" class="text-lg font-bold text-brandteal-700 transition-transform duration-200">▼</span>
+                        </button>
+
+                        <div id="definisiContent" class="hidden p-5 border-t border-brandteal-100 bg-white space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                                <div class="md:col-span-8 space-y-2">
+                                    <span class="text-xs font-bold uppercase tracking-wider text-brandteal-800 bg-brandteal-100 px-2.5 py-0.5 rounded">Definisi Resmi</span>
+                                    <h4 class="font-bold text-sm text-gray-800">Apa itu Algoritma?</h4>
+                                    <p class="text-sm text-gray-700 leading-relaxed">
+                                        <strong>Algoritma</strong> adalah urutan langkah yang masuk akal dan teratur untuk menyelesaikan sesuatu. Contohnya, saat membuat karya: siapkan bahan, ikuti pola, kerjakan tahap demi tahap, lalu periksa hasilnya.
+                                    </p>
+                                    <p class="text-sm text-gray-600 leading-relaxed">
+                                        Jadi, algoritma dapat dianggap sebagai <strong>resep kerja</strong>. Resep yang jelas membantu kita dan komputer mengetahui apa yang harus dilakukan, langkah demi langkah.
+                                    </p>
+                                </div>
+
+                                <div class="md:col-span-4 bg-warmbg p-3.5 rounded-xl border border-gray-200 text-xs text-slatecustom-800 space-y-2">
+                                    <span class="font-bold text-brandteal-700 block border-b border-gray-200 pb-1">🔑 3 Kata Kunci Mudah:</span>
+                                    <ul class="space-y-1.5 text-sm text-gray-700">
+                                        <li class="flex items-start gap-1.5">
+                                            <span class="text-brandteal-600 font-bold">•</span>
+                                            <span><strong>Logis:</strong> Langkahnya masuk akal.</span>
+                                        </li>
+                                        <li class="flex items-start gap-1.5">
+                                            <span class="text-brandteal-600 font-bold">•</span>
+                                            <span><strong>Terstruktur:</strong> Urutannya rapi dari awal sampai selesai.</span>
+                                        </li>
+                                        <li class="flex items-start gap-1.5">
+                                            <span class="text-brandteal-600 font-bold">•</span>
+                                            <span><strong>Sistematis:</strong> Dikerjakan dengan cara yang teratur.</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SUB-PART B: 5 CIRI UTAMA ALGORITMA (DONALD E. KNUTH) IN DROPDOWN / ACCORDION -->
+                    <div class="bg-white border border-gray-200 rounded-xl p-4 space-y-3 shadow-xs">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-3">
+                            <div>
+                                <span class="bg-amberaccent-50 text-amberaccent-700 font-bold text-xs px-2.5 py-1 rounded-md border border-amberaccent-500/20">DROPDOWN 2</span>
+                                <h3 class="font-bold text-sm md:text-base text-gray-800 mt-1">⭐ 5 Ciri Utama Algoritma (Donald E. Knuth)</h3>
+                                <p class="text-xs text-gray-500">Pilih salah satu ciri dari dropdown atau klik kartu untuk menyimpan/membuka informasi</p>
+                            </div>
+
+                            <!-- Dropdown Select Selector -->
+                            <div class="min-w-[220px]">
+                                <label for="selectCiriDropdown" class="text-[11px] font-bold text-gray-600 block mb-0.5">Pilih Ciri via Dropdown:</label>
+                                <select id="selectCiriDropdown" onchange="handleCiriDropdownSelect(this.value)" class="w-full text-xs font-semibold p-2 rounded-lg border border-gray-300 bg-white text-gray-800 focus:ring-2 focus:ring-brandteal-500">
+                                    <option value="all">-- Tampilkan Semua Ciri (5) --</option>
+                                    <option value="0">1. Finiteness (Keterbatasan Langkah)</option>
+                                    <option value="1">2. Definiteness (Kepastian Instruksi)</option>
+                                    <option value="2">3. Input (Data Masukan)</option>
+                                    <option value="3">4. Output (Hasil / Keluaran)</option>
+                                    <option value="4">5. Effectiveness (Efektivitas Proses)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Accordion List for 5 Characteristics -->
+                        <div class="space-y-2" id="ciriAccordionContainer">
+                            <!-- Item 1: Finiteness -->
+                            <div class="ciri-item-card border border-gray-200 rounded-lg overflow-hidden transition" id="ciriCard-0">
+                                <button onclick="toggleCiriAccordion(0)" class="w-full bg-warmbg hover:bg-gray-100 p-3 text-left flex justify-between items-center text-xs font-bold text-gray-800">
+                                    <span class="flex items-center gap-2">
+                                        <span class="bg-brandteal-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]">1</span>
+                                        Finiteness (Keterbatasan Langkah)
+                                    </span>
+                                    <span id="ciriIcon-0" class="text-gray-500 font-mono">▼</span>
+                                </button>
+                                <div id="ciriBody-0" class="hidden p-3 bg-white text-xs text-gray-700 border-t border-gray-100 space-y-1">
+                                    <p><strong>Artinya:</strong> Harus ada langkah terakhir. Kegiatan tidak boleh berputar terus-menerus tanpa selesai.</p>
+                                    <p class="text-brandteal-700 font-medium">💡 Contoh: Membuat gelang selesai setelah bahan dipasang dan hasilnya diperiksa.</p>
+                                </div>
+                            </div>
+
+                            <!-- Item 2: Definiteness -->
+                            <div class="ciri-item-card border border-gray-200 rounded-lg overflow-hidden transition" id="ciriCard-1">
+                                <button onclick="toggleCiriAccordion(1)" class="w-full bg-warmbg hover:bg-gray-100 p-3 text-left flex justify-between items-center text-xs font-bold text-gray-800">
+                                    <span class="flex items-center gap-2">
+                                        <span class="bg-brandteal-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]">2</span>
+                                        Definiteness (Kepastian Instruksi)
+                                    </span>
+                                    <span id="ciriIcon-1" class="text-gray-500 font-mono">▼</span>
+                                </button>
+                                <div id="ciriBody-1" class="hidden p-3 bg-white text-xs text-gray-700 border-t border-gray-100 space-y-1">
+                                    <p><strong>Artinya:</strong> Instruksi harus jelas dan tidak membuat orang menebak-nebak.</p>
+                                    <p class="text-brandteal-700 font-medium">💡 Contoh: “Potong kain sepanjang 20 cm” lebih jelas daripada “Potong kain secukupnya”.</p>
+                                </div>
+                            </div>
+
+                            <!-- Item 3: Input -->
+                            <div class="ciri-item-card border border-gray-200 rounded-lg overflow-hidden transition" id="ciriCard-2">
+                                <button onclick="toggleCiriAccordion(2)" class="w-full bg-warmbg hover:bg-gray-100 p-3 text-left flex justify-between items-center text-xs font-bold text-gray-800">
+                                    <span class="flex items-center gap-2">
+                                        <span class="bg-brandteal-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]">3</span>
+                                        Input (Data Masukan)
+                                    </span>
+                                    <span id="ciriIcon-2" class="text-gray-500 font-mono">▼</span>
+                                </button>
+                                <div id="ciriBody-2" class="hidden p-3 bg-white text-xs text-gray-700 border-t border-gray-100 space-y-1">
+                                    <p><strong>Artinya:</strong> Ada data atau bahan yang kita masukkan sebelum langkah dikerjakan.</p>
+                                    <p class="text-brandteal-700 font-medium">💡 Contoh: Memasukkan ukuran kain dan warna benang untuk membuat sebuah karya.</p>
+                                </div>
+                            </div>
+
+                            <!-- Item 4: Output -->
+                            <div class="ciri-item-card border border-gray-200 rounded-lg overflow-hidden transition" id="ciriCard-3">
+                                <button onclick="toggleCiriAccordion(3)" class="w-full bg-warmbg hover:bg-gray-100 p-3 text-left flex justify-between items-center text-xs font-bold text-gray-800">
+                                    <span class="flex items-center gap-2">
+                                        <span class="bg-brandteal-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]">4</span>
+                                        Output (Hasil / Keluaran)
+                                    </span>
+                                    <span id="ciriIcon-3" class="text-gray-500 font-mono">▼</span>
+                                </button>
+                                <div id="ciriBody-3" class="hidden p-3 bg-white text-xs text-gray-700 border-t border-gray-100 space-y-1">
+                                    <p><strong>Artinya:</strong> Setelah langkah-langkah selesai, ada hasil yang dapat dilihat atau digunakan.</p>
+                                    <p class="text-brandteal-700 font-medium">💡 Contoh: Ukuran pola yang sudah ditentukan atau karya yang siap dipajang.</p>
+                                </div>
+                            </div>
+
+                            <!-- Item 5: Effectiveness -->
+                            <div class="ciri-item-card border border-gray-200 rounded-lg overflow-hidden transition" id="ciriCard-4">
+                                <button onclick="toggleCiriAccordion(4)" class="w-full bg-warmbg hover:bg-gray-100 p-3 text-left flex justify-between items-center text-xs font-bold text-gray-800">
+                                    <span class="flex items-center gap-2">
+                                        <span class="bg-brandteal-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]">5</span>
+                                        Effectiveness (Efektivitas Proses)
+                                    </span>
+                                    <span id="ciriIcon-4" class="text-gray-500 font-mono">▼</span>
+                                </button>
+                                <div id="ciriBody-4" class="hidden p-3 bg-white text-xs text-gray-700 border-t border-gray-100 space-y-1">
+                                    <p><strong>Artinya:</strong> Setiap langkah harus sederhana, jelas, dan benar-benar bisa dikerjakan.</p>
+                                    <p class="text-brandteal-700 font-medium">💡 Contoh: Mengukur kain dengan penggaris sebelum memotong, bukan hanya memperkirakan dengan mata.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SUB-PART C: TRANSISI DARI DESKRIPTIF KE BENTUK TERSTRUKTUR -->
+                    <div class="pt-2">
+                        <div class="bg-warmbg p-3 rounded-xl border border-gray-200 mb-4">
+                            <span class="text-xs font-bold text-gray-800 uppercase tracking-wide block">Evolusi Representasi Algoritma:</span>
+                            <span class="text-[11px] text-gray-500">Mengapa kita perlu beralih dari bahasa sehari-hari ke bentuk terstruktur?</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <!-- 1. Contoh Deskriptif -->
+                            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-xs">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h3 class="font-bold text-sm text-gray-800">1. Algoritma Deskriptif</h3>
+                                    <span class="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded font-medium">Bahasa Sehari-hari</span>
+                                </div>
+                                    <p class="text-xs text-gray-500 mb-3">Contoh: Algoritma Membuat Gantungan Kunci Kain</p>
+                                <div class="bg-warmbg p-3 rounded-lg text-xs space-y-2 text-gray-700 font-mono">
+                                    <p class="border-b border-gray-200 pb-1">1. Siapkan kain, benang, jarum, dan pola.</p>
+                                    <p class="border-b border-gray-200 pb-1">2. Gambar pola pada kain sesuai ukuran.</p>
+                                    <p class="border-b border-gray-200 pb-1">3. Potong kain mengikuti garis pola.</p>
+                                    <p>4. Jahit tepi kain dan periksa hasilnya.</p>
+                                </div>
+                            </div>
+
+                            <!-- 2. Kelebihan & Kekurangan -->
+                            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-xs flex flex-col justify-center">
+                                <h3 class="font-bold text-sm text-gray-800 mb-3 text-center">2. Kelebihan & Kekurangan</h3>
+                                <div class="grid grid-cols-2 gap-3 text-xs">
+                                    <div class="bg-emerald-50/50 p-3 rounded-lg border border-emerald-100">
+                                        <span class="font-bold text-emerald-700 flex items-center gap-1 mb-2"><span class="text-base">👍</span> Kelebihan</span>
+                                        <ul class="list-disc list-inside text-emerald-800 space-y-1">
+                                            <li>Mudah dipahami siapa saja</li>
+                                            <li>Dapat memakai contoh sehari-hari</li>
+                                            <li>Bagus untuk menuangkan ide awal</li>
+                                        </ul>
+                                    </div>
+                                    <div class="bg-rose-50/50 p-3 rounded-lg border border-rose-100">
+                                        <span class="font-bold text-rose-700 flex items-center gap-1 mb-2"><span class="text-base">👎</span> Kekurangan</span>
+                                        <ul class="list-disc list-inside text-rose-800 space-y-1">
+                                            <li>Kata “secukupnya” bisa ditafsirkan berbeda</li>
+                                            <li>Urutan langkah mudah terlewat</li>
+                                            <li>Perlu dirapikan sebelum dibuat kode</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. Kenapa Belajar Flowchart & Pseudocode -->
+                        <div class="bg-slatecustom-900 p-5 rounded-xl border border-slatecustom-800 shadow-xs flex flex-col md:flex-row gap-5 items-center">
+                            <div class="bg-amberaccent-500 text-slatecustom-900 font-bold p-3 rounded-xl text-center w-full md:w-1/3 flex flex-col justify-center items-center">
+                                <span class="text-2xl mb-1">🎯</span>
+                                <span class="text-xs">Mengapa Kita Harus Belajar<br>Flowchart & Pseudocode?</span>
+                            </div>
+                            <div class="text-white text-xs space-y-3 w-full md:w-2/3">
+                                <p class="text-gray-300 leading-relaxed">
+                                    Bahasa sehari-hari cocok untuk menjelaskan ide, tetapi kadang membuat orang menafsirkan langkah secara berbeda. Flowchart dan pseudocode membantu kita menyusun langkah dengan lebih jelas sebelum membuat program atau bekerja bersama teman.
+                                </p>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div class="bg-slatecustom-800 p-3 rounded border border-slatecustom-700">
+                                        <span class="font-bold text-brandteal-400 block mb-1">🗺️ Flowchart = Peta Gambar</span>
+                                        <p class="text-gray-400 text-[11px] leading-relaxed">Langkah kerja digambar memakai kotak, belah ketupat, panah, dan simbol lain. Kita dapat melihat urutan serta pilihan “ya” atau “tidak” dengan cepat.</p>
+                                    </div>
+                                    <div class="bg-slatecustom-800 p-3 rounded border border-slatecustom-700">
+                                        <span class="font-bold text-amberaccent-400 block mb-1">📝 Pseudocode = Catatan Langkah</span>
+                                        <p class="text-gray-400 text-[11px] leading-relaxed">Langkah ditulis seperti catatan yang rapi dan mudah dibaca. Pseudocode bukan bahasa pemrograman, tetapi membantu menerjemahkan ide ke kode nanti.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= STEP 3: MATERI CORE STUDIO ================= -->
+        <section id="step3" class="step-content space-y-6 hidden">
+            <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+                <div class="border-b border-gray-100 pb-4 mb-4">
+                    <h2 class="text-xl font-bold text-slatecustom-900 flex items-center gap-2">
+                        <span>📘 Tahap 3: Materi Inti - Flowchart & Pseudocode Studio</span>
+                    </h2>
+                    <p class="text-sm text-gray-600 mt-1">
+                        Pelajari cara menggambar <strong>peta langkah</strong> dan menulis <strong>catatan langkah</strong> melalui contoh yang dekat dengan kehidupan di rumah dan sekolah.
+                    </p>
+                </div>
+
+                <div class="flex border-b border-gray-200 space-x-6 mb-6">
+                    <button onclick="switchMateriTab('symbols')" id="tabBtn-symbols" class="pb-2.5 text-sm font-bold border-b-2 border-brandteal-600 text-brandteal-600 transition">
+                        🔹 Simbol-Simbol Flowchart
+                    </button>
+                    <button onclick="switchMateriTab('pseudocode')" id="tabBtn-pseudocode" class="pb-2.5 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 transition">
+                        📄 Aturan Pseudocode
+                    </button>
+                    <button onclick="switchMateriTab('interactive')" id="tabBtn-interactive" class="pb-2.5 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 transition">
+                        ⚙️ Visualizer Logika Kasus
+                    </button>
+                </div>
+
+                <!-- TAB 1: FLOWCHART SYMBOLS MATRIX -->
+                <div id="materiTab-symbols" class="space-y-4">
+                    <p class="text-xs text-gray-500">Klik pada salah satu simbol di bawah untuk melihat nama, bentuk geometris, fungsi teknis, serta contoh penggunaan standar:</p>
+                    
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4" id="symbolsGrid">
+                        <!-- Dynamic Grid Buttons -->
+                    </div>
+
+                    <div id="symbolDetailPanel" class="bg-warmbg p-6 md:p-8 rounded-2xl border border-gray-300 flex flex-col md:flex-row items-center gap-8 mt-5">
+                        <div class="bg-white rounded-2xl border border-gray-200 shadow-xs flex items-center justify-center p-4">
+                            <canvas id="symbolDetailCanvas" width="180" height="180"></canvas>
+                        </div>
+                        <div class="flex-grow space-y-4 text-center md:text-left">
+                            <div class="flex flex-wrap items-center justify-center md:justify-start gap-2">
+                                <h4 id="symTitle" class="text-xl font-bold text-slatecustom-900">Terminator (Start / Stop)</h4>
+                                <span id="symEng" class="bg-white text-brandteal-700 text-xs px-2.5 py-1 rounded-full font-mono border border-brandteal-200">Terminal Symbol</span>
+                            </div>
+                                <p id="symDesc" class="text-base text-gray-600 leading-relaxed">Menandai titik awal (Start) atau titik akhir (End) dari sebuah alur program.</p>
+                                <div class="bg-white/85 p-4 rounded-xl border border-gray-200 text-sm text-gray-700 space-y-1.5 shadow-sm">
+                                <span class="font-semibold text-brandteal-700">💡 Analogi Praktis</span>
+                                <p id="symAnalogy">Seperti pintu masuk dan pintu keluar dalam gedung studio.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: ATURAN PSEUDOCODE -->
+                <div id="materiTab-pseudocode" class="hidden space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-3">
+                            <h3 class="font-bold text-sm text-gray-800">Cara Menulis Pseudocode dengan Mudah</h3>
+                            <div class="space-y-2 text-xs">
+                                <div class="bg-white p-3 rounded-lg border border-gray-200 shadow-xs">
+                                    <span class="font-bold text-brandteal-700">1. Beri nama kegiatan:</span>
+                                    <p class="text-gray-600 mt-0.5">Tuliskan tujuan algoritma. Contoh: <code class="font-mono text-pink-600">PROGRAM CekBahanKarya</code></p>
+                                </div>
+                                <div class="bg-white p-3 rounded-lg border border-gray-200 shadow-xs">
+                                    <span class="font-bold text-brandteal-700">2. Kenali data yang dibutuhkan:</span>
+                                    <p class="text-gray-600 mt-0.5">Contoh: <code class="font-mono text-pink-600">DEKLARASI jumlahBahan: Integer</code>. Bagian ini boleh sederhana saat baru belajar.</p>
+                                </div>
+                                <div class="bg-white p-3 rounded-lg border border-gray-200 shadow-xs">
+                                    <span class="font-bold text-brandteal-700">3. Tulis masukan dan hasil:</span>
+                                    <p class="text-gray-600 mt-0.5"><code class="font-mono text-pink-600">READ</code> berarti menerima data, sedangkan <code class="font-mono text-pink-600">WRITE</code> berarti menampilkan hasil.</p>
+                                </div>
+                                <div class="bg-white p-3 rounded-lg border border-gray-200 shadow-xs">
+                                    <span class="font-bold text-brandteal-700">4. Tulis pilihan jika ada:</span>
+                                    <p class="text-gray-600 mt-0.5">Gunakan <code class="font-mono text-pink-600">IF ... THEN ... ELSE ... ENDIF</code> untuk kondisi “jika ... maka ... jika tidak ...”.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slatecustom-900 rounded-xl p-4 text-white space-y-2">
+                            <div class="flex items-center justify-between border-b border-gray-700 pb-2">
+                                <span class="text-xs font-mono text-amberaccent-500">Contoh_Kegiatan_Kriya.pseudo</span>
+                                <span class="text-[10px] text-gray-400">Contoh yang mudah dibaca</span>
+                            </div>
+                            <pre class="text-xs code-font text-emerald-400 leading-relaxed overflow-x-auto">
+<span class="text-purple-400">PROGRAM</span> CekBahanKarya
+
+<span class="text-purple-400">DEKLARASI</span>
+    jumlahBahan : <span class="text-blue-300">Integer</span>
+
+<span class="text-purple-400">ALGORITMA:</span>
+    <span class="text-yellow-300">READ</span>(jumlahBahan)
+    
+    <span class="text-purple-400">IF</span> jumlahBahan >= 3 <span class="text-purple-400">THEN</span>
+        <span class="text-yellow-300">WRITE</span>("Mulai membuat karya")
+    <span class="text-purple-400">ELSE</span>
+        <span class="text-yellow-300">WRITE</span>("Lengkapi bahan dahulu")
+    <span class="text-purple-400">ENDIF</span>
+                            </pre>
+                            <div class="bg-slatecustom-800 p-3 rounded-lg border border-slatecustom-700 text-[11px] text-gray-300 leading-relaxed">
+                                <strong class="text-amberaccent-400">Catatan:</strong> Pseudocode tidak memiliki satu format wajib seperti Python. Contoh ini memakai aturan sederhana agar langkah mudah dibaca dan konsisten.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: VISUALIZER LOGIKA KASUS Core Studio -->
+                <div id="materiTab-interactive" class="hidden space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-warmbg p-4 rounded-xl border border-gray-200">
+                        <div>
+                            <span class="text-sm font-bold text-gray-700 block">Coba Logika dalam Kegiatan Kriya</span>
+                            <span class="text-xs text-gray-500">Pilih satu situasi, lalu ikuti alurnya dari bahan sampai karya siap.</span>
+                        </div>
+                        <select id="selectInteractiveCase" onchange="updateMateriVisualizer()" class="text-xs font-medium px-3 py-1.5 rounded-lg border border-gray-300 bg-white">
+                            <option value="ganjil">Contoh A: Memilah sampah di kelas</option>
+                            <option value="suhu">Contoh B: Menyiram tanaman</option>
+                            <option value="kelulusan">Contoh C: Piket kelas</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-white p-4 rounded-xl border border-gray-200">
+                            <div class="flex items-center justify-between gap-2 mb-2">
+                                <h4 class="text-sm font-bold text-gray-700">Diagram Alur Kegiatan</h4>
+                                <button onclick="downloadCanvasImage('coreFlowchartCanvas', 'flowchart-core-studio.png')" class="text-[10px] font-bold text-brandteal-700 hover:text-brandteal-900">
+                                    ↓ Unduh gambar
+                                </button>
+                            </div>
+                            <div class="bg-warmbg rounded-lg p-2 border border-gray-200 flex justify-center">
+                                <canvas id="coreFlowchartCanvas" width="280" height="340"></canvas>
+                            </div>
+                        </div>
+                        <div class="bg-slatecustom-900 p-4 rounded-xl text-white flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 mb-2">
+                                    <h4 class="text-sm font-bold text-amberaccent-500">Pseudocode sebagai Gambar</h4>
+                                    <button onclick="downloadCanvasImage('corePseudocodeCanvas', 'pseudocode-core-studio.png')" class="text-[10px] font-bold text-amberaccent-400 hover:text-amberaccent-200">
+                                        ↓ Unduh gambar
+                                    </button>
+                                </div>
+                                <div class="bg-slatecustom-800 rounded-lg border border-slatecustom-700 p-2 flex justify-center">
+                                    <canvas id="corePseudocodeCanvas" width="620" height="360"></canvas>
+                                </div>
+                            </div>
+                            <div class="mt-4 bg-slatecustom-800 p-3 rounded-lg border border-slatecustom-700 text-xs text-gray-300">
+                                💡 Perhatikan: simbol belah ketupat adalah pertanyaan, sedangkan persegi panjang adalah <strong>proses/tindakan</strong> yang dilakukan. Jawaban “Ya” dan “Tidak” mengarahkan kita ke langkah yang berbeda, sama seperti <span class="text-amberaccent-500">IF...THEN</span> pada pseudocode.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= STEP 4: PRAKTIK LKPD CANVA ================= -->
+        <section id="step4" class="step-content space-y-6 hidden">
+            <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+                <div class="border-b border-gray-100 pb-4 mb-4 flex flex-col md:flex-row justify-between md:items-center gap-3">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-xl font-bold text-slatecustom-900">🎨 Tahap 4: Penugasan LKPD - Poster Canva (Custom A4)</h2>
+                            <span class="bg-amberaccent-50 text-amberaccent-700 text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-amberaccent-500/30">Kasus Baru Khusus Praktik</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-1">
+                            Saatnya Anda merancang poster informatif 1 halaman di Canva berdasarkan kegiatan yang sering dijumpai di rumah dan sekolah. Buat flowchart dan pseudocode dari salah satu kasus berikut.
+                        </p>
+                    </div>
+                    <button onclick="openExternalLink('drive')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-4 py-2 rounded-xl shadow-xs transition flex items-center gap-2">
+                        <span>Kumpul ke Google Drive</span> 📤
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Left Column: New Distinct Case Studies -->
+                    <div class="lg:col-span-6 space-y-4">
+                        <div class="bg-warmbg p-4 rounded-xl border border-gray-200 space-y-3">
+                            <h3 class="font-bold text-sm text-gray-800">1. Pilih Kasus di Lingkungan Sekitar:</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                <button onclick="setLkpdCase(1)" id="lkpdBtn1" class="p-2.5 rounded-lg border text-left text-xs bg-brandteal-600 text-white font-medium shadow-xs">
+                                    <strong>Kasus 1:</strong> Cuci Pakaian
+                                </button>
+                                <button onclick="setLkpdCase(2)" id="lkpdBtn2" class="p-2.5 rounded-lg border text-left text-xs bg-white text-gray-700 hover:bg-gray-50 border-gray-300">
+                                    <strong>Kasus 2:</strong> Jajan Kantin
+                                </button>
+                                <button onclick="setLkpdCase(3)" id="lkpdBtn3" class="p-2.5 rounded-lg border text-left text-xs bg-white text-gray-700 hover:bg-gray-50 border-gray-300">
+                                    <strong>Kasus 3:</strong> Mi Rebus
+                                </button>
+                            </div>
+
+                            <div class="bg-white p-4 rounded-lg border border-gray-200 text-xs space-y-2">
+                                <span class="font-bold text-brandteal-700 block text-sm" id="lkpdCaseTitle">Kasus 1: Mencuci Pakaian</span>
+                                <p id="lkpdCaseDesc" class="text-gray-600 leading-relaxed">
+                                    Buatlah algoritma mencuci pakaian. Jika tersedia mesin cuci, masukkan pakaian dan atur program. Jika tidak tersedia, siapkan ember lalu cuci dengan tangan. Setelah itu, jemur dan simpan pakaian.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Canva Technical Requirements Card -->
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 space-y-3">
+                            <h3 class="font-bold text-sm text-gray-800">2. Spesifikasi Wajib Desain Canva:</h3>
+                            <ul class="text-xs space-y-2 text-gray-600 list-disc list-inside">
+                                <li><strong>Platform:</strong> Canva (<a href="https://www.canva.com" target="_blank" class="text-brandteal-600 underline">www.canva.com</a>)</li>
+                                <li><strong>Ukuran Kertas (Custom Size):</strong> <span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-mono font-bold">Lebar 21 cm x Tinggi 29,7 cm</span> (A4 Portrait).</li>
+                                <li><strong>Komponen Wajib Poster (1 Halaman):</strong> Identitas (Nama/Kelas), Judul Poster, Deskripsi Kasus, Flowchart, dan Pseudocode.</li>
+                                <li><strong>Format Ekspor File:</strong> PDF / PNG / JPG.</li>
+                                <li><strong>Format Penamaan File:</strong> <code class="font-mono text-pink-600 font-bold">Kelas_NamaLengkap_Kasus.pdf</code><br><span class="text-[11px] text-gray-400">Contoh: X-Kriya_BudiSantoso_Kasus1.pdf</span></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Interactive A4 Canva Mockup Checklist Preview -->
+                    <div class="lg:col-span-6 flex flex-col items-center">
+                        <span class="text-xs font-bold text-gray-500 mb-2">Simulasi Real-time Tata Letak Canvas Poster A4 (21 x 29.7 cm)</span>
+                        
+                        <div class="a4-preview-ratio bg-white border-2 border-dashed border-gray-400 rounded-lg p-4 shadow-md flex flex-col justify-between text-slatecustom-900 relative">
+                            <!-- Header Block -->
+                            <div class="border-b-2 border-brandteal-600 pb-2 text-center">
+                                <div class="text-[9px] text-gray-400 font-mono">HEADER / IDENTITAS (BAGIAN ATAS)</div>
+                                <h4 class="text-xs font-extrabold text-brandteal-700 uppercase tracking-tight" id="mockupTitle">POSTER ALGORITMA: KASUS 1 MENCUCI PAKAIAN</h4>
+                                <div class="text-[10px] font-semibold text-gray-600 mt-0.5 flex justify-center gap-3">
+                                    <span>Nama: [Nama Siswa]</span> | <span>Kelas: X-SMK</span>
+                                </div>
+                            </div>
+
+                            <!-- Case Text Block -->
+                                <div class="bg-gray-50 p-2 rounded text-[9px] text-gray-600 border border-gray-200">
+                                    <strong>Studi Kasus Praktik:</strong> <span id="mockupDesc">Jika ada mesin cuci, gunakan mesin. Jika tidak, cuci dengan tangan, lalu jemur dan simpan pakaian.</span>
+                            </div>
+
+                            <!-- Flowchart Box (Simulated Canvas) -->
+                            <div class="bg-teal-50/50 p-2 rounded border border-teal-200 text-center flex flex-col items-center justify-center flex-grow my-1">
+                                <span class="text-[9px] font-bold text-teal-800 mb-1">AREA FLOWCHART (SHAPES CANVA)</span>
+                                <div class="w-full flex justify-center">
+                                    <canvas id="posterCanvas" width="320" height="300"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- Pseudocode Box -->
+                            <div class="bg-slatecustom-900 text-amberaccent-500 p-2 rounded text-[9px] code-font min-h-[10rem] overflow-visible">
+                                <span class="text-white font-bold block mb-0.5">// PSEUDOCODE PRAKTIK</span>
+                                <canvas id="mockupPseudoCanvas" width="300" height="190"></canvas>
+                            </div>
+
+                            <!-- Footer Note -->
+                            <div class="text-[8px] text-center text-gray-400 pt-1 border-t border-gray-200">
+                                Digambar secara kreatif di Canva - Ukuran Custom A4 (21 x 29.7 cm)
+                            </div>
+                            <div class="flex justify-center gap-2 pt-1">
+                                <button onclick="downloadCanvasImage('posterCanvas', `flowchart-lkpd-${currentLkpdCaseId}.png`)" class="text-[9px] font-bold text-brandteal-700 hover:text-brandteal-900">
+                                    ↓ Flowchart
+                                </button>
+                                <button onclick="downloadCanvasImage('mockupPseudoCanvas', `pseudocode-lkpd-${currentLkpdCaseId}.png`)" class="text-[9px] font-bold text-brandteal-700 hover:text-brandteal-900">
+                                    ↓ Pseudocode
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= STEP 5: EVALUASI POST-TEST ================= -->
+        <section id="step5" class="step-content space-y-6 hidden">
+            <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+                <div class="border-b border-gray-100 pb-4 mb-4 flex flex-col md:flex-row justify-between md:items-center gap-3">
+                    <div>
+                        <h2 class="text-xl font-bold text-slatecustom-900 flex items-center gap-2">
+                            <span>📝 Tahap 5: Evaluasi Pembelajaran (Post-Test)</span>
+                        </h2>
+                        <p class="text-sm text-gray-600 mt-1">
+                            Setelah memahami materi dan menyelesaikan praktikum poster LKPD, marilah diukur peningkatan kompetensi Anda melalui Post-Test Quizizz.
+                        </p>
+                    </div>
+                    <button onclick="openExternalLink('quizizz')" class="bg-purple-600 hover:bg-purple-700 text-white font-medium px-5 py-2.5 rounded-xl shadow-sm text-sm flex items-center gap-2 transition">
+                        <span>Buka Post-Test Quizizz</span> ↗
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="lg:col-span-7 bg-warmbg p-5 rounded-xl border border-gray-200 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold uppercase tracking-wider text-purple-700 bg-purple-100 px-2.5 py-1 rounded">Simulasi Post-Test Interaktif</span>
+                            <span id="postScoreBadge" class="text-xs font-semibold text-gray-500">Skor: 0 / 3</span>
+                        </div>
+
+                        <div id="postTestContainer" class="bg-white p-5 rounded-lg border border-gray-200 space-y-3">
+                            <div id="postQ1" class="space-y-2">
+                                <p class="text-xs font-bold text-gray-800">1. Simbol flowchart berbentuk Belah Ketupat (Decision) digunakan untuk:</p>
+                                <div class="grid grid-cols-1 gap-1.5 text-xs">
+                                    <button onclick="checkPostAnswer(1, false, this)" class="p-2 border rounded-lg text-left hover:bg-gray-50">A. Memulai atau mengakhiri program</button>
+                                    <button onclick="checkPostAnswer(1, true, this)" class="p-2 border rounded-lg text-left hover:bg-gray-50">B. Penyeleksian kondisi / Pengambilan keputusan</button>
+                                    <button onclick="checkPostAnswer(1, false, this)" class="p-2 border rounded-lg text-left hover:bg-gray-50">C. Memasukkan data dari pengguna</button>
+                                </div>
+                            </div>
+
+                            <div id="postQ2" class="space-y-2 pt-3 border-t border-gray-100">
+                                <p class="text-xs font-bold text-gray-800">2. Manakah penulisan kata kunci keputusan pseudocode yang benar?</p>
+                                <div class="grid grid-cols-1 gap-1.5 text-xs">
+                                    <button onclick="checkPostAnswer(2, true, this)" class="p-2 border rounded-lg text-left hover:bg-gray-50">A. IF ... THEN ... ELSE ... ENDIF</button>
+                                    <button onclick="checkPostAnswer(2, false, this)" class="p-2 border rounded-lg text-left hover:bg-gray-50">B. FOR ... TO ... DO</button>
+                                    <button onclick="checkPostAnswer(2, false, this)" class="p-2 border rounded-lg text-left hover:bg-gray-50">C. REPEAT ... UNTIL</button>
+                                </div>
+                            </div>
+
+                            <div id="postQ3" class="space-y-2 pt-3 border-t border-gray-100">
+                                <p class="text-xs font-bold text-gray-800">3. Apakah pseudocode dapat langsung dijalankan oleh komputer tanpa ditransformasikan ke bahasa pemrograman?</p>
+                                <div class="grid grid-cols-1 gap-1.5 text-xs">
+                                    <button onclick="checkPostAnswer(3, false, this)" class="p-2 border rounded-lg text-left hover:bg-gray-50">A. Ya, karena pseudocode adalah bahasa mesin</button>
+                                    <button onclick="checkPostAnswer(3, true, this)" class="p-2 border rounded-lg text-left hover:bg-gray-50">B. Tidak, pseudocode hanya untuk dibaca manusia sebelum dikoding</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-5 bg-white p-5 rounded-xl border border-gray-200 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-bold text-gray-800 text-sm mb-1">Simulasi Peningkatan Ketuntasan Hasil Belajar</h3>
+                            <p class="text-xs text-gray-500 mb-4">Perbandingan rata-rata pemahaman siswa Pre-Test vs Post-Test.</p>
+
+                            <div class="chart-container">
+                                <canvas id="chartGrowth"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 bg-emerald-50 p-3 rounded-lg border border-emerald-200 text-xs text-emerald-800">
+                            <strong>🎉 Target Capaian:</strong> Terjadi peningkatan minimal 35% pada kemampuan mentransformasikan deskriptif menjadi flowchart & pseudocode.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= STEP 6: REFLEKSI PADLET ================= -->
+        <section id="step6" class="step-content space-y-6 hidden">
+            <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+                <div class="border-b border-gray-100 pb-4 mb-4 flex flex-col md:flex-row justify-between md:items-center gap-3">
+                    <div>
+                        <h2 class="text-xl font-bold text-slatecustom-900 flex items-center gap-2">
+                            <span>📌 Tahap 6: Refleksi Pembelajaran Interaktif (Padlet)</span>
+                        </h2>
+                        <p class="text-sm text-gray-600 mt-1">
+                            Sebagai penutup pembelajaran hari ini, bagikan tanggapan jujur Anda melalui board Padlet interaktif.
+                        </p>
+                    </div>
+                    <button onclick="openExternalLink('padlet')" class="bg-pink-600 hover:bg-pink-700 text-white font-medium px-5 py-2.5 rounded-xl shadow-sm text-sm flex items-center gap-2 transition">
+                        <span>Buka Board Padlet</span> ↗
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-warmbg p-5 rounded-xl border border-gray-200 space-y-4">
+                        <h3 class="font-bold text-sm text-gray-800">2 Pertanyaan Panduan Refleksi:</h3>
+                        
+                        <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-xs space-y-1">
+                            <span class="text-xs font-bold text-brandteal-700">Pertanyaan 1:</span>
+                            <p class="text-xs text-gray-700">
+                                "Bagian mana dari materi hari ini (Flowchart, Pseudocode, atau Praktik Canva) yang paling menarik bagimu? Mengapa?"
+                            </p>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-xs space-y-1">
+                            <span class="text-xs font-bold text-amberaccent-600">Pertanyaan 2:</span>
+                            <p class="text-xs text-gray-700">
+                                "Bagian mana yang dirasa masih sulit atau membingungkan dalam merancang algoritma?"
+                            </p>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-lg border border-gray-200 space-y-3 pt-3">
+                            <span class="text-xs font-bold text-gray-700">Kirim Catatan Refleksi Cepat (Simulasi Web):</span>
+                            <input type="text" id="refStudentName" placeholder="Nama Lengkap & Kelas..." class="w-full text-xs p-2.5 rounded-lg border border-gray-300">
+                            <textarea id="refStudentText" rows="3" placeholder="Tulis refleksi Anda di sini..." class="w-full text-xs p-2.5 rounded-lg border border-gray-300"></textarea>
+                            <button onclick="addLocalReflection()" class="w-full bg-brandteal-600 hover:bg-brandteal-700 text-white text-xs font-bold py-2 rounded-lg transition">
+                                Posting Refleksi Ke Dinding Simulasi
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl border border-gray-200 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between border-b border-gray-100 pb-2 mb-3">
+                                <h3 class="font-bold text-sm text-gray-800">Dinding Refleksi Kelas (Live Simulation)</h3>
+                                <span class="text-[10px] bg-pink-100 text-pink-700 px-2 py-0.5 rounded font-bold">Padlet Stream</span>
+                            </div>
+
+                            <div id="reflectionWall" class="space-y-2.5 max-h-[340px] overflow-y-auto pr-1">
+                                <div class="bg-pink-50/60 p-3 rounded-lg border border-pink-100 text-xs">
+                                    <div class="flex justify-between items-center text-pink-800 font-bold mb-1">
+                                        <span>Siti Aminah (X-TKJ 1)</span>
+                                        <span class="text-[10px] text-gray-400">Baru saja</span>
+                                    </div>
+                                    <p class="text-gray-700">Saya sangat menyukai bagian mendesain poster di Canva karena bisa langsung membuat bentuk flowchart yang rapi dengan warna-warna menarik!</p>
+                                </div>
+                                <div class="bg-purple-50/60 p-3 rounded-lg border border-purple-100 text-xs">
+                                    <div class="flex justify-between items-center text-purple-800 font-bold mb-1">
+                                        <span>Rizky Pratama (X-RPL 2)</span>
+                                        <span class="text-[10px] text-gray-400">5 menit lalu</span>
+                                    </div>
+                                    <p class="text-gray-700">Awalnya bingung membedakan belah ketupat dan jajaran genjang, tapi setelah mencoba simulasi interaktif jadi paham fungsinya.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-3 border-t border-gray-100 text-center text-xs text-gray-500">
+                            Rencana Materi Minggu Depan: <span class="font-bold text-slatecustom-900">Pengenalan Dasar Bahasa Pemrograman (Python / C++)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-gray-200 mt-8 py-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-500 gap-2">
+            <div>
+                © Media Ajar Interaktif Informatika Fase E - Kelas X SMK
+            </div>
+            <div class="flex items-center space-x-4">
+                <span>Modul: Flowchart & Pseudocode</span>
+                <span>•</span>
+                <span>Metode Pembelajaran Berbasis Proyek (LKPD Canva)</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL FOR LINK CONFIGURATION -->
+    <div id="linkModal" class="fixed inset-0 bg-slatecustom-900/60 backdrop-blur-xs flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-gray-200 space-y-4">
+            <div class="flex justify-between items-center border-b border-gray-100 pb-3">
+                <h3 id="modalTitle" class="font-bold text-base text-gray-900">Akses Portal Eksternal</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-lg">✕</button>
+            </div>
+            <p id="modalDesc" class="text-xs text-gray-600">
+                Anda akan diarahkan ke link layanan eksternal pembelajaran. Masukkan/sesuaikan URL jika diperlukan oleh Guru:
+            </p>
+            <div class="space-y-2">
+                <label class="text-[11px] font-bold text-gray-700">URL Target Link:</label>
+                <input type="text" id="modalUrlInput" class="w-full text-xs p-2.5 rounded-lg border border-gray-300 font-mono text-gray-800" readonly>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeModal()" class="px-4 py-2 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200">Batal</button>
+                <button onclick="confirmOpenLink()" class="px-4 py-2 text-xs font-bold text-white bg-brandteal-600 rounded-lg hover:bg-brandteal-700">Kunjungi Link ↗</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC & LIBRARIES -->
+    <script>
+        /* ================= STATE & DATA STORE ================= */
+        const globalLinks = {
+            quizizz: 'https://quizizz.com/join',
+            drive: 'https://drive.google.com',
+            padlet: 'https://padlet.com'
+        };
+
+        let currentActiveStep = 'step1';
+
+        // Pre-test sample dataset
+        const preTestQuestions = [
+            {
+                q: "Apa pengertian utama dari Algoritma dalam Informatika?",
+                opts: [
+                    "Kumpulan perangkat keras komputer",
+                    "Urutan langkah-langkah logis dan terstruktur untuk menyelesaikan masalah",
+                    "Bahasa pemrograman rahasia mesin",
+                    "Tampilan visual antarmuka aplikasi"
+                ],
+                ans: 1,
+                topic: "Konsep Algoritma"
+            },
+            {
+                q: "Manakah yang BUKAN merupakan ciri algoritma yang baik menurut Donald E. Knuth?",
+                opts: [
+                    "Memiliki titik akhir yang jelas (Finiteness)",
+                    "Langkah-langkahnya bernilai pasti (Definiteness)",
+                    "Memiliki langkah berulang tanpa henti (Infinite Loop)",
+                    "Memiliki input dan menghasilkan output"
+                ],
+                ans: 2,
+                topic: "Ciri Algoritma"
+            },
+            {
+                q: "Pengulangan langkah resep masakan termasuk bentuk representasi algoritma jenis apa?",
+                opts: [
+                    "Flowchart Diagram",
+                    "Pseudocode Komputer",
+                    "Deskriptif (Bahasa Sehari-hari)",
+                    "Bahasa Mesin Biner"
+                ],
+                ans: 2,
+                topic: "Representasi Deskriptif"
+            },
+            {
+                q: "Pernahkah Anda melihat bentuk diagram alir bersimbol kotak & panah sebelumnya (Flowchart)?",
+                opts: [
+                    "Sering melihat dan sudah paham",
+                    "Pernah melihat tetapi belum tahu fungsinya",
+                    "Belum pernah melihat sama sekali",
+                    "Sudah sering membuat di komputer"
+                ],
+                ans: 0,
+                topic: "Diagnostik Visual"
+            },
+            {
+                q: "Menurut Anda, apa kegunaan utama simbol standar dalam instruksi diagram?",
+                opts: [
+                    "Hanya sebagai hiasan warna-warni",
+                    "Agar mudah dipahami secara seragam oleh siapa saja",
+                    "Agar ukuran berkas program menjadi kecil",
+                    "Memperlambat proses kerja komputer"
+                ],
+                ans: 1,
+                topic: "Standardisasi Logika"
+            }
+        ];
+
+        let currentQuizIdx = 0;
+        let quizAnswers = Array(preTestQuestions.length).fill(null);
+
+        // Flowchart Symbol Library Data
+        const symbolData = [
+            { id: 'term', name: 'Terminator', eng: 'Terminal Symbol', desc: 'Menandai titik awal (Start) atau titik akhir (End) dari sebuah flowchart.', analogy: 'Pintu gerbang masuk atau keluar studio.', draw: drawTerminalSymbol },
+            { id: 'process', name: 'Process', eng: 'Processing Symbol', desc: 'Menunjukkan operasi pengolahan data atau perhitungan aritmatika.', analogy: 'Mesin pemroses atau koki yang sedang memasak.', draw: drawProcessSymbol },
+            { id: 'io', name: 'Input / Output', eng: 'Input/Output Symbol', desc: 'Menandai proses penerimaan data masukan atau penayangan hasil keluaran.', analogy: 'Kasir yang menerima uang (input) dan memberi struk (output).', draw: drawIOSymbol },
+            { id: 'decision', name: 'Decision', eng: 'Decision Symbol', desc: 'Menunjukkan percabangan kondisi logis (Ya / Tidak).', analogy: 'Persimpangan jalan dengan papan petunjuk arah.', draw: drawDecisionSymbol },
+            { id: 'line', name: 'Flowline', eng: 'Flow Direction Line', desc: 'Menunjukkan arah aliran urutan eksekusi langkah demi langkah.', analogy: 'Papan petunjuk panah di jalan raya.', draw: drawLineSymbol },
+            { id: 'conn', name: 'Connector', eng: 'In-page Connector', desc: 'Menghubungkan alur flowchart dalam halaman yang sama agar rapi.', analogy: 'Jembatan penyambung kabel.', draw: drawConnectorSymbol }
+        ];
+
+        let selectedSymbolIdx = 0;
+
+        // Dynamic Chart Objects
+        let chartDiagnostikObj = null;
+        let chartGrowthObj = null;
+
+        /* ================= INITIALIZATION ================= */
+        window.addEventListener('DOMContentLoaded', () => {
+            renderQuizQuestion();
+            initDiagnostikChart();
+            initGrowthChart();
+            renderSymbolGrid();
+            selectSymbol(0);
+            updateMateriVisualizer();
+            setLkpdCase(1);
+        });
+
+        /* ================= STEP NAVIGATION ================= */
+        function switchStep(stepId) {
+            currentActiveStep = stepId;
+            document.querySelectorAll('.step-content').forEach(sec => sec.classList.add('hidden'));
+            document.getElementById(stepId).classList.remove('hidden');
+
+            const navButtons = document.querySelectorAll('#stepNav button');
+            navButtons.forEach(btn => {
+                btn.className = "px-3.5 py-2 rounded-md transition flex items-center gap-2 text-gray-300 hover:text-white hover:bg-slatecustom-800";
+            });
+
+            const activeBtn = document.getElementById(`nav-${stepId}`);
+            if (activeBtn) {
+                activeBtn.className = "px-3.5 py-2 rounded-md transition flex items-center gap-2 bg-brandteal-600 text-white font-semibold shadow-xs";
+            }
+
+            if (stepId === 'step3') selectSymbol(selectedSymbolIdx);
+            if (stepId === 'step4') setLkpdCase(currentLkpdCaseId);
+        }
+
+        /* ================= STEP 1: PRE-TEST INTERACTIVE SIMULATOR ================= */
+        function renderQuizQuestion() {
+            const item = preTestQuestions[currentQuizIdx];
+            document.getElementById('questionNum').innerText = `Soal ${currentQuizIdx + 1} dari ${preTestQuestions.length}`;
+            document.getElementById('questionTopic').innerText = item.topic;
+            document.getElementById('questionText').innerText = item.q;
+
+            const optsContainer = document.getElementById('optionsContainer');
+            optsContainer.innerHTML = '';
+
+            item.opts.forEach((opt, idx) => {
+                const isSelected = quizAnswers[currentQuizIdx] === idx;
+                const btn = document.createElement('button');
+                btn.className = `w-full text-left p-3 rounded-lg text-xs font-medium border transition flex items-center justify-between ${
+                    isSelected ? 'bg-brandteal-50 border-brandteal-600 text-brandteal-800 font-bold' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
+                }`;
+                btn.innerHTML = `<span>${String.fromCharCode(65 + idx)}. ${opt}</span> ${isSelected ? '✓' : ''}`;
+                btn.onclick = () => selectQuizAnswer(idx);
+                optsContainer.appendChild(btn);
+            });
+
+            document.getElementById('prevBtn').disabled = currentQuizIdx === 0;
+            document.getElementById('nextBtn').innerText = currentQuizIdx === preTestQuestions.length - 1 ? 'Selesai' : 'Selanjutnya';
+            
+            const totalScore = quizAnswers.reduce((acc, curr, i) => (curr === preTestQuestions[i].ans ? acc + 1 : acc), 0);
+            document.getElementById('quizScoreBadge').innerText = `Skor: ${totalScore} / ${preTestQuestions.length}`;
+        }
+
+        function selectQuizAnswer(optIdx) {
+            quizAnswers[currentQuizIdx] = optIdx;
+            renderQuizQuestion();
+        }
+
+        function navigateQuiz(dir) {
+            if (dir === 1 && currentQuizIdx < preTestQuestions.length - 1) {
+                currentQuizIdx++;
+                renderQuizQuestion();
+            } else if (dir === -1 && currentQuizIdx > 0) {
+                currentQuizIdx--;
+                renderQuizQuestion();
+            } else if (dir === 1 && currentQuizIdx === preTestQuestions.length - 1) {
+                const totalScore = quizAnswers.reduce((acc, curr, i) => (curr === preTestQuestions[i].ans ? acc + 1 : acc), 0);
+                const fb = document.getElementById('feedbackBox');
+                fb.classList.remove('hidden');
+                fb.className = "mt-4 p-3 rounded-lg text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-300";
+                fb.innerText = `Pre-Test Selesai! Skor Anda: ${totalScore}/${preTestQuestions.length}. Hasil ini telah dicatat untuk memetakan kelompok belajar.`;
+            }
+        }
+
+        function initDiagnostikChart() {
+            const ctx = document.getElementById('chartDiagnostik').getContext('2d');
+            chartDiagnostikObj = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Sangat Siap (Tinggi)', 'Siap (Sedang)', 'Perlu Bimbingan (Dasar)'],
+                    datasets: [{
+                        data: [25, 55, 20],
+                        backgroundColor: ['#0D9488', '#F59E0B', '#94A3B8'],
+                        borderWidth: 2,
+                        borderColor: '#FFFFFF'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } }
+                    }
+                }
+            });
+        }
+
+        /* ================= STEP 2: REVIEW APERSEPSI LOGIC & DROPDOWNS ================= */
+        // Dropdown 1 Toggle: Pengertian Algoritma
+        function toggleDefinisiDropdown() {
+            const content = document.getElementById('definisiContent');
+            const icon = document.getElementById('definisiIcon');
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                content.classList.add('hidden');
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // Dropdown 2 & Accordion Handlers: 5 Characteristics
+        function toggleCiriAccordion(idx) {
+            const body = document.getElementById(`ciriBody-${idx}`);
+            const icon = document.getElementById(`ciriIcon-${idx}`);
+            const card = document.getElementById(`ciriCard-${idx}`);
+
+            const isOpen = !body.classList.contains('hidden');
+
+            if (isOpen) {
+                body.classList.add('hidden');
+                icon.innerText = '▼';
+                card.classList.remove('border-brandteal-500', 'shadow-xs');
+            } else {
+                body.classList.remove('hidden');
+                icon.innerText = '▲';
+                card.classList.add('border-brandteal-500', 'shadow-xs');
+            }
+        }
+
+        function handleCiriDropdownSelect(val) {
+            if (val === 'all') {
+                for (let i = 0; i < 5; i++) {
+                    const body = document.getElementById(`ciriBody-${i}`);
+                    const icon = document.getElementById(`ciriIcon-${i}`);
+                    const card = document.getElementById(`ciriCard-${i}`);
+                    body.classList.remove('hidden');
+                    icon.innerText = '▲';
+                    card.classList.add('border-brandteal-500');
+                }
+            } else {
+                const selectedIdx = parseInt(val);
+                for (let i = 0; i < 5; i++) {
+                    const body = document.getElementById(`ciriBody-${i}`);
+                    const icon = document.getElementById(`ciriIcon-${i}`);
+                    const card = document.getElementById(`ciriCard-${i}`);
+                    if (i === selectedIdx) {
+                        body.classList.remove('hidden');
+                        icon.innerText = '▲';
+                        card.classList.add('border-brandteal-500', 'shadow-xs');
+                    } else {
+                        body.classList.add('hidden');
+                        icon.innerText = '▼';
+                        card.classList.remove('border-brandteal-500', 'shadow-xs');
+                    }
+                }
+            }
+        }
+
+        /* CANVAS DRAWING UTILITIES FOR FLOWCHARTS (NO SVG) */
+        function clearCanvas(canvas) {
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function drawShapePill(ctx, x, y, w, h, text) {
+            ctx.fillStyle = '#0D9488';
+            ctx.strokeStyle = '#0F766E';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(x - w/2, y - h/2, w, h, h/2);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = `bold ${Math.max(10, Math.min(16, w / 8))}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, x, y);
+        }
+
+        function drawShapeRect(ctx, x, y, w, h, text) {
+            ctx.fillStyle = '#3B82F6';
+            ctx.strokeStyle = '#1D4ED8';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.rect(x - w/2, y - h/2, w, h);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = `${Math.max(10, Math.min(15, w / 8))}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, x, y);
+        }
+
+        function drawShapeParallelogram(ctx, x, y, w, h, text) {
+            ctx.fillStyle = '#F59E0B';
+            ctx.strokeStyle = '#D97706';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            const skew = 12;
+            ctx.moveTo(x - w/2 + skew, y - h/2);
+            ctx.lineTo(x + w/2 + skew, y - h/2);
+            ctx.lineTo(x + w/2 - skew, y + h/2);
+            ctx.lineTo(x - w/2 - skew, y + h/2);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = `${Math.max(10, Math.min(15, w / 8))}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, x, y);
+        }
+
+        function drawShapeDiamond(ctx, x, y, w, h, text) {
+            ctx.fillStyle = '#EC4899';
+            ctx.strokeStyle = '#BE185D';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(x, y - h/2);
+            ctx.lineTo(x + w/2, y);
+            ctx.lineTo(x, y + h/2);
+            ctx.lineTo(x - w/2, y);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = `${Math.max(9, Math.min(14, w / 8))}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, x, y);
+        }
+
+        function drawArrowHead(ctx, x1, y1, x2, y2) {
+            const angle = Math.atan2(y2 - y1, x2 - x1);
+            ctx.fillStyle = '#475569';
+            ctx.beginPath();
+            ctx.moveTo(x2, y2);
+            ctx.lineTo(x2 - 8 * Math.cos(angle - Math.PI / 6), y2 - 8 * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(x2 - 8 * Math.cos(angle + Math.PI / 6), y2 - 8 * Math.sin(angle + Math.PI / 6));
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        function drawArrowLine(ctx, x1, y1, x2, y2, label = '') {
+            ctx.strokeStyle = '#475569';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+            drawArrowHead(ctx, x1, y1, x2, y2);
+
+            if (label) {
+                ctx.fillStyle = '#0F172A';
+                ctx.font = 'bold 11px sans-serif';
+                ctx.fillText(label, (x1 + x2)/2 + 8, (y1 + y2)/2 - 4);
+            }
+        }
+
+        // Jalur bercabang dibuat siku-siku agar panah benar-benar masuk ke simbol proses.
+        function drawBranchArrow(ctx, decisionX, decisionY, decisionHalfWidth, branchX, processTopY, label, direction) {
+            const edgeX = decisionX + (decisionHalfWidth * direction);
+            const labelX = edgeX + ((branchX - edgeX) / 2);
+
+            ctx.strokeStyle = '#475569';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(edgeX, decisionY);
+            ctx.lineTo(branchX, decisionY);
+            ctx.lineTo(branchX, processTopY);
+            ctx.stroke();
+            drawArrowHead(ctx, branchX, processTopY - 10, branchX, processTopY);
+
+            ctx.fillStyle = '#0F172A';
+            ctx.font = 'bold 11px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(label, labelX, decisionY - 8);
+            ctx.textAlign = 'left';
+        }
+
+        /* Flowcharts Studio/Apersepsi */
+        function drawFlowchartKopi(canvas) {
+            clearCanvas(canvas);
+            const ctx = canvas.getContext('2d');
+            const cx = canvas.width / 2;
+
+            drawShapePill(ctx, cx, 25, 90, 24, "START");
+            drawArrowLine(ctx, cx, 37, cx, 60);
+            drawShapeParallelogram(ctx, cx, 72, 110, 24, "Input Kopi & Air");
+            drawArrowLine(ctx, cx, 84, cx, 107);
+            drawShapeRect(ctx, cx, 119, 110, 24, "Aduk Hingga Larut");
+            drawArrowLine(ctx, cx, 131, cx, 154);
+            drawShapeParallelogram(ctx, cx, 166, 110, 24, "Cetak Kopi Siap");
+            drawArrowLine(ctx, cx, 178, cx, 198);
+            drawShapePill(ctx, cx, 208, 90, 22, "END");
+        }
+
+        function drawFlowchartDemam(canvas) {
+            clearCanvas(canvas);
+            const ctx = canvas.getContext('2d');
+            const cx = canvas.width / 2;
+
+            drawShapePill(ctx, cx, 20, 80, 20, "START");
+            drawArrowLine(ctx, cx, 30, cx, 50);
+            drawShapeParallelogram(ctx, cx, 60, 100, 22, "Kondisi Tanah");
+            drawArrowLine(ctx, cx, 71, cx, 95);
+            drawShapeDiamond(ctx, cx, 115, 110, 36, "Tanah Kering?");
+
+            drawBranchArrow(ctx, cx, 115, 55, cx + 80, 140, "Ya", 1);
+            drawShapeRect(ctx, cx + 80, 150, 90, 20, "Siram Tanaman");
+            
+            drawBranchArrow(ctx, cx, 115, 55, cx - 80, 140, "Tidak", -1);
+            drawShapeRect(ctx, cx - 80, 150, 85, 20, "Tidak Disiram");
+
+            drawArrowLine(ctx, cx + 80, 160, cx + 10, 195);
+            drawArrowLine(ctx, cx - 80, 160, cx - 10, 195);
+            drawShapePill(ctx, cx, 202, 75, 20, "END");
+        }
+
+        function drawFlowchartDiskon(canvas) {
+            clearCanvas(canvas);
+            const ctx = canvas.getContext('2d');
+            const cx = canvas.width / 2;
+
+            drawShapePill(ctx, cx, 20, 80, 20, "START");
+            drawArrowLine(ctx, cx, 30, cx, 52);
+            drawShapeParallelogram(ctx, cx, 62, 100, 20, "Input Total");
+            drawArrowLine(ctx, cx, 72, cx, 95);
+            drawShapeDiamond(ctx, cx, 112, 105, 32, "Total > 100k?");
+
+            drawBranchArrow(ctx, cx, 112, 52, cx + 75, 138, "Ya", 1);
+            drawShapeRect(ctx, cx + 75, 148, 80, 20, "Diskon 10%");
+
+            drawBranchArrow(ctx, cx, 112, 52, cx - 75, 138, "Tidak", -1);
+            drawShapeRect(ctx, cx - 75, 148, 80, 20, "Diskon 0%");
+
+            drawArrowLine(ctx, cx + 75, 158, cx, 185);
+            drawArrowLine(ctx, cx - 75, 158, cx, 185);
+            drawShapePill(ctx, cx, 195, 75, 20, "END");
+        }
+
+        /* Flowcharts Studio Core */
+        function drawFlowchartGanjil(canvas) {
+            clearCanvas(canvas);
+            const ctx = canvas.getContext('2d');
+            const cx = canvas.width / 2;
+
+            drawShapePill(ctx, cx, 20, 80, 20, "START");
+            drawArrowLine(ctx, cx, 30, cx, 52);
+            drawShapeParallelogram(ctx, cx, 62, 110, 20, "Jenis Sampah");
+            drawArrowLine(ctx, cx, 72, cx, 95);
+            drawShapeDiamond(ctx, cx, 112, 110, 32, "Organik?");
+
+            drawBranchArrow(ctx, cx, 112, 55, cx + 75, 138, "Ya", 1);
+            drawShapeRect(ctx, cx + 75, 148, 90, 20, "Tong Organik");
+
+            drawBranchArrow(ctx, cx, 112, 55, cx - 75, 138, "Tidak", -1);
+            drawShapeRect(ctx, cx - 75, 148, 95, 20, "Tong Anorganik");
+
+            drawArrowLine(ctx, cx + 75, 158, cx, 185);
+            drawArrowLine(ctx, cx - 75, 158, cx, 185);
+            drawShapePill(ctx, cx, 195, 75, 20, "END");
+        }
+
+        function drawFlowchartKelulusan(canvas) {
+            clearCanvas(canvas);
+            const ctx = canvas.getContext('2d');
+            const cx = canvas.width / 2;
+
+            drawShapePill(ctx, cx, 20, 80, 20, "START");
+            drawArrowLine(ctx, cx, 30, cx, 52);
+            drawShapeParallelogram(ctx, cx, 62, 100, 20, "Cek Kelas");
+            drawArrowLine(ctx, cx, 72, cx, 95);
+            drawShapeDiamond(ctx, cx, 112, 110, 32, "Kelas Bersih?");
+
+            drawBranchArrow(ctx, cx, 112, 52, cx + 75, 138, "Ya", 1);
+            drawShapeRect(ctx, cx + 75, 148, 90, 20, "Siap Belajar");
+
+            drawBranchArrow(ctx, cx, 112, 52, cx - 75, 138, "Tidak", -1);
+            drawShapeRect(ctx, cx - 75, 148, 85, 20, "Lanjut Piket");
+
+            drawArrowLine(ctx, cx + 75, 158, cx, 185);
+            drawArrowLine(ctx, cx - 75, 158, cx, 185);
+            drawShapePill(ctx, cx, 195, 75, 20, "END");
+        }
+
+        /* FLOWCHARTS TAHAP 4: ALUR KOMPUTASIONAL DENGAN SATU IF...ELSE */
+        function drawLkpdBranchFlowchart(canvas, config) {
+            clearCanvas(canvas);
+            const ctx = canvas.getContext('2d');
+            const cx = canvas.width / 2;
+            const branchX = 88;
+            const branchProcessW = 116;
+            const firstProcessTop = 117;
+            const secondProcessY = 159;
+            const mergeY = 190;
+            const commonProcessW = 150;
+
+            drawShapePill(ctx, cx, 15, 70, 18, "START");
+            drawArrowLine(ctx, cx, 24, cx, 40);
+            drawShapeParallelogram(ctx, cx, 49, config.inputWidth, 18, config.input);
+            drawArrowLine(ctx, cx, 58, cx, 72);
+            drawShapeDiamond(ctx, cx, 90, config.decisionWidth, 32, config.decision);
+
+            drawBranchArrow(ctx, cx, 90, config.decisionWidth / 2, cx + branchX, firstProcessTop, "Ya", 1);
+            drawShapeRect(ctx, cx + branchX, 127, branchProcessW, 20, config.yesFirst);
+            drawArrowLine(ctx, cx + branchX, 139, cx + branchX, 150);
+            drawShapeRect(ctx, cx + branchX, secondProcessY, branchProcessW, 20, config.yesSecond);
+
+            drawBranchArrow(ctx, cx, 90, config.decisionWidth / 2, cx - branchX, firstProcessTop, "Tidak", -1);
+            drawShapeRect(ctx, cx - branchX, 127, branchProcessW, 20, config.noFirst);
+            drawArrowLine(ctx, cx - branchX, 139, cx - branchX, 150);
+            drawShapeRect(ctx, cx - branchX, secondProcessY, branchProcessW, 20, config.noSecond);
+
+            // Kedua cabang bergabung kembali sebelum menjalankan langkah akhir bersama.
+            drawArrowLine(ctx, cx + branchX, 170, cx, mergeY);
+            drawArrowLine(ctx, cx - branchX, 170, cx, mergeY);
+            drawArrowLine(ctx, cx, mergeY, cx, 203);
+            drawShapeRect(ctx, cx, 213, commonProcessW, 20, config.commonFirst);
+            drawArrowLine(ctx, cx, 223, cx, 235);
+            drawShapeRect(ctx, cx, 245, commonProcessW, 20, config.commonSecond);
+            drawArrowLine(ctx, cx, 255, cx, 266);
+            drawShapePill(ctx, cx, 276, 70, 18, "END");
+        }
+
+        function drawFlowchartSim(canvas) {
+            drawLkpdBranchFlowchart(canvas, {
+                input: "Cek Mesin",
+                inputWidth: 90,
+                decision: "Mesin Cuci?",
+                decisionWidth: 105,
+                yesFirst: "Masukkan Pakaian",
+                yesSecond: "Atur Program",
+                noFirst: "Siapkan Ember",
+                noSecond: "Cuci Manual",
+                commonFirst: "Jemur Pakaian",
+                commonSecond: "Simpan Pakaian"
+            });
+        }
+
+        function drawFlowchartOngkir(canvas) {
+            drawLkpdBranchFlowchart(canvas, {
+                input: "Cek Uang",
+                inputWidth: 90,
+                decision: "Uang Cukup?",
+                decisionWidth: 110,
+                yesFirst: "Pilih Makanan",
+                yesSecond: "Bayar di Kasir",
+                noFirst: "Pilih Menu Hemat",
+                noSecond: "Bayar di Kasir",
+                commonFirst: "Ambil Pesanan",
+                commonSecond: "Buang Sampah"
+            });
+        }
+
+        function drawFlowchartBioskop(canvas) {
+            drawLkpdBranchFlowchart(canvas, {
+                input: "Cek Bahan",
+                inputWidth: 95,
+                decision: "Siap Dimasak?",
+                decisionWidth: 115,
+                yesFirst: "Siapkan Mie",
+                yesSecond: "Siapkan Bumbu",
+                noFirst: "Isi Air",
+                noSecond: "Didihkan Air",
+                commonFirst: "Masukkan & Rebus",
+                commonSecond: "Sajikan Mie"
+            });
+        }
+
+        /* ================= STEP 3: SYMBOLS MATRIX & MATERI CORE ================= */
+        function switchMateriTab(tabKey) {
+            ['symbols', 'pseudocode', 'interactive'].forEach(k => {
+                document.getElementById(`materiTab-${k}`).classList.add('hidden');
+                document.getElementById(`tabBtn-${k}`).className = "pb-2.5 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 transition";
+            });
+            document.getElementById(`materiTab-${tabKey}`).classList.remove('hidden');
+            document.getElementById(`tabBtn-${tabKey}`).className = "pb-2.5 text-sm font-bold border-b-2 border-brandteal-600 text-brandteal-600 transition";
+            
+            if (tabKey === 'symbols') selectSymbol(selectedSymbolIdx);
+            if (tabKey === 'interactive') updateMateriVisualizer();
+        }
+
+        function renderSymbolGrid() {
+            const grid = document.getElementById('symbolsGrid');
+            grid.innerHTML = '';
+            symbolData.forEach((sym, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `p-3 rounded-xl border flex flex-col items-center justify-center space-y-2 transition ${
+                    selectedSymbolIdx === idx ? 'bg-brandteal-50 border-brandteal-600 shadow-xs' : 'bg-white border-gray-200 hover:bg-gray-50'
+                }`;
+                btn.onclick = () => selectSymbol(idx);
+                btn.innerHTML = `
+                    <div class="w-10 h-10 flex items-center justify-center">
+                         <canvas id="gridSymCanvas_${idx}" width="60" height="60"></canvas>
+                    </div>
+                    <span class="text-xs font-bold text-gray-800 text-center">${sym.name}</span>
+                `;
+                grid.appendChild(btn);
+
+                setTimeout(() => {
+                    const c = document.getElementById(`gridSymCanvas_${idx}`);
+                    if (c) sym.draw(c, true);
+                }, 50);
+            });
+        }
+
+        function selectSymbol(idx) {
+            selectedSymbolIdx = idx;
+            renderSymbolGrid();
+            const sym = symbolData[idx];
+
+            document.getElementById('symTitle').innerText = sym.name;
+            document.getElementById('symEng').innerText = sym.eng;
+            document.getElementById('symDesc').innerText = sym.desc;
+            document.getElementById('symAnalogy').innerText = sym.analogy;
+
+            const c = document.getElementById('symbolDetailCanvas');
+            sym.draw(c, false);
+        }
+
+        /* Symbol Canvas Handlers */
+        function drawTerminalSymbol(canvas, mini = false) {
+            clearCanvas(canvas);
+            const ctx = canvas.getContext('2d');
+            const cx = canvas.width / 2, cy = canvas.height / 2;
+            drawShapePill(ctx, cx, cy, mini ? 40 : 125, mini ? 20 : 46, mini ? "" : "START / END");
+        }
+        function drawProcessSymbol(canvas, mini = false) {
+            clearCanvas(canvas);
+            const ctx = canvas.getContext('2d');
+            const cx = canvas.width / 2, cy = canvas.height / 2;
+            drawShapeRect(ctx, cx, cy, mini ? 40 : 125, mini ? 20 : 46, mini ? "" : "PROSES");
+        }
+        function drawIOSymbol(canvas, mini = false) {
+            clearCanvas(canvas);
+            const ctx = canvas.getContext('2d');
+            const cx = canvas.width / 2, cy = canvas.height / 2;
+            drawShapeParallelogram(ctx, cx, cy, mini ? 40 : 135, mini ? 20 : 48, mini ? "" : "INPUT / OUTPUT");
+        }
+        function drawDecisionSymbol(canvas, mini = false) {
+            clearCanvas(canvas);
+            const ctx = canvas.getContext('2d');
+            const cx = canvas.width / 2, cy = canvas.height / 2;
+            drawShapeDiamond(ctx, cx, cy, mini ? 40 : 135, mini ? 30 : 72, mini ? "" : "KEPUTUSAN?");
+        }
+        function drawLineSymbol(canvas, mini = false) {
+            clearCanvas(canvas);
+            const ctx = canvas.getContext('2d');
+            if (mini) {
+                drawArrowLine(ctx, 8, 30, 52, 30);
+            } else {
+                drawArrowLine(ctx, 28, 90, 152, 90, "Alur Logika");
+            }
+        }
+        function drawConnectorSymbol(canvas, mini = false) {
+            clearCanvas(canvas);
+            const ctx = canvas.getContext('2d');
+            const cx = canvas.width / 2, cy = canvas.height / 2;
+            const r = mini ? 10 : 28;
+            ctx.fillStyle = '#8B5CF6';
+            ctx.strokeStyle = '#6D28D9';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            if (!mini) {
+                ctx.fillStyle = '#FFFFFF';
+                ctx.font = 'bold 14px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('A1', cx, cy);
+            }
+        }
+
+        function drawPseudocodeCanvas(canvas, source, options = {}) {
+            const ctx = canvas.getContext('2d');
+            const fontSize = options.fontSize || 14;
+            const lineHeight = options.lineHeight || Math.round(fontSize * 1.55);
+            const padding = options.padding || 18;
+            const maxWidth = canvas.width - (padding * 2);
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = options.background || '#0F172A';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = options.color || '#A7F3D0';
+            ctx.font = `${fontSize}px "Courier New", monospace`;
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+
+            const lines = [];
+            source.split('\n').forEach(line => {
+                if (!line) {
+                    lines.push('');
+                    return;
+                }
+
+                let remaining = line;
+                while (ctx.measureText(remaining).width > maxWidth) {
+                    let cut = remaining.length - 1;
+                    while (cut > 1 && ctx.measureText(remaining.slice(0, cut)).width > maxWidth) cut--;
+                    const breakAt = remaining.lastIndexOf(' ', cut);
+                    const splitAt = breakAt > 1 ? breakAt : cut;
+                    lines.push(remaining.slice(0, splitAt));
+                    remaining = remaining.slice(splitAt).trimStart();
+                }
+                lines.push(remaining);
+            });
+
+            lines.forEach((line, index) => {
+                const y = padding + (index * lineHeight);
+                if (y + lineHeight <= canvas.height - padding) {
+                    ctx.fillText(line, padding, y);
+                }
+            });
+        }
+
+        function downloadCanvasImage(canvasId, filename) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        /* Core Visualizer Updater */
+        function updateMateriVisualizer() {
+            const val = document.getElementById('selectInteractiveCase').value;
+            const canvas = document.getElementById('coreFlowchartCanvas');
+            const pseudoCanvas = document.getElementById('corePseudocodeCanvas');
+            let pseudo = '';
+
+            if (val === 'ganjil') {
+                drawFlowchartGanjil(canvas);
+                pseudo = `PROGRAM PilahSampah\nDEKLARASI sampahOrganik : Boolean\n\nALGORITMA:\n  READ(sampahOrganik)\n  IF sampahOrganik = TRUE THEN\n    WRITE("Masukkan ke Tong Organik")\n  ELSE\n    WRITE("Masukkan ke Tong Anorganik")\n  ENDIF`;
+            } else if (val === 'suhu') {
+                drawFlowchartDemam(canvas);
+                pseudo = `PROGRAM RawatTanaman\nDEKLARASI tanahKering : Boolean\n\nALGORITMA:\n  READ(tanahKering)\n  IF tanahKering = TRUE THEN\n    WRITE("Siram Tanaman")\n  ELSE\n    WRITE("Belum Perlu Siram")\n  ENDIF`;
+            } else {
+                drawFlowchartKelulusan(canvas);
+                pseudo = `PROGRAM PiketKelas\nDEKLARASI kelasBersih : Boolean\n\nALGORITMA:\n  READ(kelasBersih)\n  IF kelasBersih = TRUE THEN\n    WRITE("Siap Belajar")\n  ELSE\n    WRITE("Lanjutkan Piket")\n  ENDIF`;
+            }
+
+            drawPseudocodeCanvas(pseudoCanvas, pseudo, { fontSize: 14, lineHeight: 22, padding: 22 });
+        }
+
+        /* ================= STEP 4: NEW DISTINCT LKPD CANVA CASES ================= */
+        let currentLkpdCaseId = 1;
+
+        const lkpdCases = {
+            1: {
+                title: "Kasus 1: Mencuci Pakaian",
+                desc: "Buatlah algoritma mencuci pakaian. Jika tersedia mesin cuci, masukkan pakaian dan atur program. Jika tidak tersedia, siapkan ember lalu cuci secara manual. Setelah itu, jemur dan simpan pakaian.",
+                pseudo: `PROGRAM CuciPakaian\nDEKLARASI mesinCuciTersedia: Boolean\nREAD mesinCuciTersedia\nIF mesinCuciTersedia = TRUE THEN\n   WRITE "Masukkan Pakaian"\n   WRITE "Atur Program"\nELSE\n   WRITE "Siapkan Ember"\n   WRITE "Cuci Manual"\nENDIF\nWRITE "Jemur Pakaian"\nWRITE "Simpan Pakaian"`,
+                draw: drawFlowchartSim
+            },
+            2: {
+                title: "Kasus 2: Jajan di Kantin",
+                desc: "Buatlah algoritma saat jajan di kantin. Jika uang cukup, pilih makanan dan bayar. Jika uang belum cukup untuk menu yang diinginkan, pilih menu hemat lalu bayar. Setelah itu, ambil pesanan dan buang sampah.",
+                pseudo: `PROGRAM JajanKantin\nDEKLARASI uangCukup: Boolean\nREAD uangCukup\nIF uangCukup = TRUE THEN\n   WRITE "Pilih Makanan"\n   WRITE "Bayar di Kasir"\nELSE\n   WRITE "Pilih Menu Hemat"\n   WRITE "Bayar di Kasir"\nENDIF\nWRITE "Ambil Pesanan"\nWRITE "Buang Sampah"`,
+                draw: drawFlowchartOngkir
+            },
+            3: {
+                title: "Kasus 3: Memasak Mi Rebus",
+                desc: "Buatlah algoritma memasak mi rebus. Jika air dan bahan sudah siap, siapkan mi dan bumbu. Jika belum, isi air lalu didihkan. Setelah kedua kondisi siap, masukkan bahan, rebus, dan sajikan.",
+                pseudo: `PROGRAM MasakMiRebus\nDEKLARASI siapDimasak: Boolean\nREAD siapDimasak\nIF siapDimasak = TRUE THEN\n   WRITE "Siapkan Mie"\n   WRITE "Siapkan Bumbu"\nELSE\n   WRITE "Isi Air"\n   WRITE "Didihkan Air"\nENDIF\nWRITE "Masukkan dan Rebus"\nWRITE "Sajikan Mie"`,
+                draw: drawFlowchartBioskop
+            }
+        };
+
+        function setLkpdCase(id) {
+            currentLkpdCaseId = id;
+
+            [1, 2, 3].forEach(i => {
+                const btn = document.getElementById(`lkpdBtn${i}`);
+                if (i === id) {
+                    btn.className = "p-2.5 rounded-lg border text-left text-xs bg-brandteal-600 text-white font-medium shadow-xs";
+                } else {
+                    btn.className = "p-2.5 rounded-lg border text-left text-xs bg-white text-gray-700 hover:bg-gray-50 border-gray-300";
+                }
+            });
+
+            const data = lkpdCases[id];
+            document.getElementById('lkpdCaseTitle').innerText = data.title;
+            document.getElementById('lkpdCaseDesc').innerText = data.desc;
+
+            // Update Canva A4 Mockup View
+            document.getElementById('mockupTitle').innerText = `POSTER ALGORITMA: ${data.title.toUpperCase()}`;
+            document.getElementById('mockupDesc').innerText = data.desc;
+            drawPseudocodeCanvas(document.getElementById('mockupPseudoCanvas'), data.pseudo, {
+                fontSize: 10,
+                lineHeight: 15,
+                padding: 10,
+                color: '#FCD34D'
+            });
+
+            const posterCanvas = document.getElementById('posterCanvas');
+            data.draw(posterCanvas);
+        }
+
+        /* ================= STEP 5: POST-TEST EVALUASI ================= */
+        let postAnswers = { 1: null, 2: null, 3: null };
+
+        function checkPostAnswer(qNum, isCorrect, btnEl) {
+            postAnswers[qNum] = isCorrect;
+            const parent = btnEl.parentElement;
+            const btns = parent.querySelectorAll('button');
+            btns.forEach(b => b.className = "p-2 border rounded-lg text-left hover:bg-gray-50 text-xs");
+
+            if (isCorrect) {
+                btnEl.className = "p-2 border rounded-lg text-left bg-emerald-100 border-emerald-500 text-emerald-800 font-bold text-xs";
+            } else {
+                btnEl.className = "p-2 border rounded-lg text-left bg-rose-100 border-rose-500 text-rose-800 font-bold text-xs";
+            }
+
+            const total = Object.values(postAnswers).filter(v => v === true).length;
+            document.getElementById('postScoreBadge').innerText = `Skor: ${total} / 3`;
+        }
+
+        function initGrowthChart() {
+            const ctx = document.getElementById('chartGrowth').getContext('2d');
+            chartGrowthObj = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Pemahaman Simbol', 'Penulisan Pseudocode', 'Logika Percabangan'],
+                    datasets: [
+                        { label: 'Pre-Test', data: [45, 30, 40], backgroundColor: '#94A3B8' },
+                        { label: 'Post-Test (Target)', data: [88, 85, 92], backgroundColor: '#0D9488' }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } }
+                    }
+                }
+            });
+        }
+
+        /* ================= STEP 6: REFLEKSI PADLET ================= */
+        function addLocalReflection() {
+            const name = document.getElementById('refStudentName').value.trim() || 'Siswa Anonim';
+            const text = document.getElementById('refStudentText').value.trim();
+
+            if (!text) {
+                alert('Silakan tuliskan catatan refleksi Anda terlebih dahulu.');
+                return;
+            }
+
+            const wall = document.getElementById('reflectionWall');
+            const card = document.createElement('div');
+            card.className = "bg-brandteal-50/70 p-3 rounded-lg border border-brandteal-200 text-xs animate-fade-in";
+            card.innerHTML = `
+                <div class="flex justify-between items-center text-brandteal-800 font-bold mb-1">
+                    <span>${name}</span>
+                    <span class="text-[10px] text-gray-400">Baru saja</span>
+                </div>
+                <p class="text-gray-700">${text}</p>
+            `;
+            wall.prepend(card);
+
+            document.getElementById('refStudentText').value = '';
+        }
+
+        /* ================= MODAL & PORTAL LINKS ================= */
+        let currentLinkTarget = '';
+
+        function openExternalLink(type) {
+            currentLinkTarget = type;
+            const modal = document.getElementById('linkModal');
+            const title = document.getElementById('modalTitle');
+            const input = document.getElementById('modalUrlInput');
+
+            if (type === 'quizizz') {
+                title.innerText = 'Portal Quizizz (Pre-Test & Post-Test)';
+                input.value = globalLinks.quizizz;
+            } else if (type === 'drive') {
+                title.innerText = 'Folder Pengumpulan Poster G-Drive';
+                input.value = globalLinks.drive;
+            } else if (type === 'padlet') {
+                title.innerText = 'Dinding Refleksi Padlet';
+                input.value = globalLinks.padlet;
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('linkModal').classList.add('hidden');
+        }
+
+        function confirmOpenLink() {
+            const url = document.getElementById('modalUrlInput').value;
+            window.open(url, '_blank');
+            closeModal();
+        }
+    </script>
+</body>
+</html>
